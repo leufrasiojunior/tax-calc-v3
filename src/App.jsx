@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import {formatter} from "./Components/index"
+import {formatter, exchangeDolar} from "./Components/index"
 import getExchange from "./assets/api"
 
 function App() {
@@ -8,17 +8,22 @@ function App() {
   const [discount, setDiscount] = useState('');
   const [tax, setTax] = useState('');
   const [todaydolar, setTodaydolar] = useState('');
+  const [dolarValue, setdolarValue] = useState('');
+  const [icmsValor, seticmsValor] = useState('');
 
 const handleSubmit = (e) => {
   e.preventDefault()
-  const customsValue = parseFloat(price+shippingvalue-discount)/(parseFloat(todaydolar.bid))
-  console.log("customsValue", customsValue)
-  if (tax == 0 ){
-  setTax(17) 
-  console.log("tax",tax)}
-  console.log("custom", customsValue * tax)
+  
+  setdolarValue(parseFloat(price+shippingvalue-discount)/(parseFloat(todaydolar.bid)))
+  Lassthen()
 }
 
+// Enviar via props os atributos dos calculos
+
+const Lassthen = () => {
+  return (price / (1 - 0.17) * 0.17);
+}
+  
 const exchange = async () => {
   await getExchange
     .get("/json/last/USD-BRL")
@@ -27,6 +32,7 @@ const exchange = async () => {
       )
       .catch((err) => {
         console.log("Erro ao carregar" + err);
+        setTodaydolar(5)
       });
     };
     
@@ -38,6 +44,7 @@ const exchange = async () => {
 
   return (
     <>
+    <Lassthen/>
       <h1>Tax-Calculator! Sua calculadora Aliexpress, Shein, Banggood...</h1>
       <div className="container">
         <form>
@@ -47,13 +54,13 @@ const exchange = async () => {
               type="text"
               className="form-control"
               id="dolvalue" 
-              value={formatter.format(parseFloat(todaydolar.bid))}
-              
+              placeholder={formatter.format(parseFloat(todaydolar.bid))}
             />
+            <small>O valor é identificado altomaticamente. Caso queira trocar, insira o valor.</small>
           </div>
 
           <div className="form-group">
-            <label htmlFor="price">Digite o preço do produto(2)</label>
+            <label htmlFor="price">Digite o preço do produto</label>
             <input
               type="number"
               className="form-control"
@@ -66,7 +73,7 @@ const exchange = async () => {
 
           <div className="form-group">
             <label htmlFor="shipping">
-              Digite o Valor do Frete(Deixe em branco para Gratis)
+              Digite o Valor do Frete
             </label>
             <input
               type="number"
@@ -75,6 +82,7 @@ const exchange = async () => {
               value={shippingvalue}
               onChange={(i)=>{setShippingValue(i.target.value)}}
             />
+            <small>Deixe em branco para Gratis</small>
           </div>
 
           <div className="form-group">
@@ -86,6 +94,7 @@ const exchange = async () => {
               value={discount}
               onChange={(d)=>{setDiscount(d.target.value)}}
             />
+            <small>Atualmente as compras do Aliexpress, o imposto é de acordo com o valor pago.</small>
           </div>
 
           <div className="form-group">
@@ -95,7 +104,12 @@ const exchange = async () => {
             id="tax" 
             value={tax}
             onChange={(t)=>{setTax(t.target.value)}}
-            placeholder="Deixe em branco para 17%(Padrão)"/>
+            />
+          <small>Deixe em branco para o padrão de 17%</small>
+          </div>
+
+          <div className="showResults">
+          <p>Valor em Dólar: {exchangeDolar.format(dolarValue)}</p>
           </div>
 
           {/* <div className="form-group">
