@@ -13,7 +13,7 @@ function App() {
 
 const handleSubmit = (e) => {
   e.preventDefault()
-  
+  // a
   setdolarValue(parseFloat(price+shippingvalue-discount)/(parseFloat(todaydolar.bid)))
   Lassthen()
 }
